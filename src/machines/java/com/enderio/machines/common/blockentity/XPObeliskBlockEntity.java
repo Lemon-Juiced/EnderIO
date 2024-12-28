@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -153,8 +154,16 @@ public class XPObeliskBlockEntity extends MachineBlockEntity {
         int cappedVolume = (int) Math.min(Integer.MAX_VALUE, volume);
         cappedVolume = cappedVolume - cappedVolume % ExperienceUtil.EXP_TO_FLUID;
 
+        // Determine the fluid to fill with
+        Fluid fillFluid = EIOFluids.XP_JUICE.getSource();
+        var currentFluid = TANK.getFluid(this);
+
+        if (!currentFluid.isEmpty() && !currentFluid.getFluid().isSame(fillFluid)) {
+            fillFluid = currentFluid.getFluid();
+        }
+
         // Add the fluid
-        int filled = TANK.fill(this, new FluidStack(EIOFluids.XP_JUICE.getSource(), cappedVolume), IFluidHandler.FluidAction.EXECUTE);
+        int filled = TANK.fill(this, new FluidStack(fillFluid, cappedVolume), IFluidHandler.FluidAction.EXECUTE);
 
         // Remove the XP from the player
         // Workaround some floating point problems when adding all the exp at once.

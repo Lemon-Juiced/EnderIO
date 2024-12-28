@@ -37,6 +37,10 @@ public class AlloySmeltingRecipe implements MachineRecipe<AlloySmeltingRecipe.Co
     private final boolean isSmelting;
 
     public AlloySmeltingRecipe(ResourceLocation id, List<CountedIngredient> inputs, ItemStack output, int energy, float experience, boolean isSmelting) {
+        if (isSmelting && inputs.size() > 1) {
+            throw new IllegalArgumentException("More than one smelting ingredient given");
+        }
+        
         this.id = id;
         this.inputs = inputs;
         this.output = output;
@@ -146,7 +150,7 @@ public class AlloySmeltingRecipe implements MachineRecipe<AlloySmeltingRecipe.Co
     public List<OutputStack> craft(ContainerWrapper container, RegistryAccess registryAccess) {
         ItemStack outputStack = output.copy();
         if (isSmelting) {
-            outputStack.setCount(container.inputsTaken);
+            outputStack.setCount(outputStack.getCount() * container.inputsTaken);
         }
 
         return List.of(OutputStack.of(outputStack));
